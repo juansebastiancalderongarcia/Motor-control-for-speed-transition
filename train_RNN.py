@@ -77,18 +77,16 @@ class RNNDynamics(nn.Module):
         f_rate_exc = f_rate[mask.unsqueeze(0)].unsqueeze(0)
         return self.W_out(f_rate_exc)
 
-    def RK4(self, x_initial, g, n_time):
-        h = 5/n_time #delta time in RK4
-        x_present = x_initial #[N,1]
-
-        for time in range(1,n_time):
-            k1 = self.f_dynamics(x_present, g)
-            k2 = self.f_dynamics(x_present + (1/2)*k1, g)
-            k3 = self.f_dynamics(x_present + (1/2)*k2, g)
-            k4 = self.f_dynamics(x_present + k3, g)
+    def RK4(self, x,g):
         
-            x_present = x_present + (h/6)*(k1 + 2*k2 + 2*k3 + k4)
-        return x_present
+        h = 5
+
+        k1 = self.f_dynamics(x , g)
+        k2 = self.f_dynamics(x + (h/2)*k1, g)
+        k3 = self.f_dynamics(x + (h/2)*k2, g)
+        k4 = self.f_dynamics(x + h*k3, g)
+        
+        return x + (h/6)*(k1 + 2*k2 + 2*k3 + k4)
 
     def forward(self,x_slow, x_fast):
 
